@@ -3,6 +3,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { StarsBackground } from "@/components/ui/stars-background";
 import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "NEBULA — Planet Intelligence Dashboard",
@@ -84,6 +85,7 @@ export default function RootLayout({
           <div className="relative z-10 min-h-screen flex flex-col">
             <Navigation />
             <main className="flex-1">{children}</main>
+            <Footer />
           </div>
         </Providers>
       </body>

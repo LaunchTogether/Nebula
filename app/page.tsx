@@ -336,12 +336,12 @@ export default function HomePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-20"
+          className="flex flex-col items-center justify-center text-center mx-auto mb-20 w-full"
         >
-          <h2 className="font-serif text-4xl md:text-5xl text-[#fafafa] mb-6">
+          <h2 className="font-serif text-4xl md:text-5xl text-[#fafafa] mb-6 text-center">
             Comprehensive <span className="italic text-[#a1a1aa]">Insights</span>
           </h2>
-          <p className="text-[#71717a] text-lg max-w-2xl mx-auto font-light">
+          <p className="text-[#71717a] text-lg max-w-2xl text-center font-light">
             An operating system designed for curiosity. Explore data modules spanning
             from the Earth's core to deep space.
           </p>
@@ -372,23 +372,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Elegant Footer */}
-      <footer className="relative border-t border-white/5 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <Globe className="w-5 h-5 text-[#71717a]" strokeWidth={1.5} />
-            <span className="font-serif text-lg tracking-tight text-[#fafafa]">
-              Nebula.
-            </span>
-          </div>
-          <p className="text-[#71717a] text-sm text-center">
-            Designed for discovery. Data provided by NASA, USGS, NOAA, and Open-Meteo.
-          </p>
-          <div className="text-[#71717a] text-sm">
-            © {new Date().getFullYear()}
-          </div>
-        </div>
-      </footer>
+
     </div>
   );
 }
