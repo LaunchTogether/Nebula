@@ -336,12 +336,12 @@ export default function HomePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center justify-center text-center mx-auto mb-20 w-full"
+          className="mx-auto mb-20 max-w-3xl text-center flex flex-col items-center"
         >
-          <h2 className="font-serif text-4xl md:text-5xl text-[#fafafa] mb-6 text-center">
-            Comprehensive <span className="italic text-[#a1a1aa]">Insights</span>
+          <h2 className="font-serif text-4xl md:text-5xl text-[#fafafa] mb-6 text-center w-full">
+            Comprehensive <span className="italic text-[#a1a1aa] pr-2">Insights</span>
           </h2>
-          <p className="text-[#71717a] text-lg max-w-2xl text-center font-light">
+          <p className="text-[#71717a] text-lg text-center font-light w-full">
             An operating system designed for curiosity. Explore data modules spanning
             from the Earth's core to deep space.
           </p>
