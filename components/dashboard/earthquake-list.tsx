@@ -2,10 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, Maximize2, X, MapPin, Clock, Waves } from "lucide-react";
-import { useState } from "react";
+import { AlertTriangle, Maximize2, X, MapPin, Clock, Waves, Bell } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { FavoriteButton } from "@/components/ui/favorite-button";
+import { useNotifications } from "@/hooks/use-notifications";
 
 interface EarthquakeFeature {
   id: string;
@@ -43,6 +44,8 @@ function MagBadge({ mag }: { mag: number }) {
 
 export function EarthquakeList() {
   const [selected, setSelected] = useState<EarthquakeFeature | null>(null);
+  const { permission, requestPermission, sendNotification } = useNotifications();
+  const notifiedIds = useRef<Set<string>>(new Set());
 
   const { data, isLoading } = useQuery<{ features: EarthquakeFeature[] }>({
     queryKey: ["earthquakes"],
@@ -50,11 +53,32 @@ export function EarthquakeList() {
     refetchInterval: 1000 * 60 * 10,
   });
 
+  const quakes = data?.features?.slice(0, 15) || [];
+
+  // Check for new major earthquakes
+  useEffect(() => {
+    if (!data?.features || permission !== 'granted') return;
+
+    data.features.forEach(quake => {
+      const isMajor = quake.properties.mag >= 6.5;
+      const isNew = !notifiedIds.current.has(quake.id);
+
+      if (isMajor && isNew) {
+        sendNotification(`Major Earthquake Alert!`, {
+          body: `M${quake.properties.mag.toFixed(1)} detected near ${quake.properties.place}`,
+          icon: '/favicon.ico'
+        });
+        notifiedIds.current.add(quake.id);
+      } else if (isNew) {
+        // Just keep track of them so we don't notify if they get updated
+        notifiedIds.current.add(quake.id);
+      }
+    });
+  }, [data, permission, sendNotification]);
+
   if (isLoading) {
     return <div className="glass-card h-64 skeleton" />;
   }
-
-  const quakes = data?.features?.slice(0, 15) || [];
 
   return (
     <>
@@ -63,6 +87,19 @@ export function EarthquakeList() {
         animate={{ opacity: 1, y: 0 }}
         className="glass-card overflow-hidden"
       >
+        <div className="flex items-center justify-between p-3 border-b border-white/[0.03]">
+          <span className="text-white/60 text-xs font-semibold uppercase tracking-widest pl-2">Recent Quakes</span>
+          {permission === 'default' && (
+            <button
+              onClick={requestPermission}
+              className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/[0.03] hover:bg-white/[0.06] text-white/40 text-[10px] transition-colors border border-white/[0.06]"
+              title="Enable notifications for major earthquakes (>6.5)"
+            >
+              <Bell className="w-3 h-3" />
+              Enable Alerts
+            </button>
+          )}
+        </div>
         <div className="divide-y divide-white/[0.03]">
           {quakes.map((quake, i) => {
             const colors = getMagColor(quake.properties.mag);

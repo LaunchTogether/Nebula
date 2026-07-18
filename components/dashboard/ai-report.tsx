@@ -8,29 +8,20 @@ interface AIReportProps {
   earthquakeCount: number;
 }
 
-function generateReport(earthquakeCount: number): string {
-  const date = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-
-  const quakeDesc =
-    earthquakeCount > 30
-      ? `${earthquakeCount} earthquakes magnitude 4.0+ were recorded in the past 7 days globally, indicating elevated seismic activity.`
-      : earthquakeCount > 10
-      ? `${earthquakeCount} earthquakes above magnitude 4.0 have been recorded this week, with tectonic activity remaining moderate.`
-      : earthquakeCount > 0
-      ? `Only ${earthquakeCount} notable earthquakes recorded this week — seismic activity is relatively calm.`
-      : "Seismic monitoring services are currently updating. Check back shortly for earthquake data.";
-
-  return `Planet Intelligence Report — ${date}. ${quakeDesc} The International Space Station continues its orbit at 408km altitude, completing 15.5 orbits per day at 27,600 km/h. Solar activity remains at KP index 2 — quiet conditions with minimal aurora probability. Monitoring all Earth and space systems in real-time.`;
-}
-
 export function AIReport({ earthquakeCount }: AIReportProps) {
-  const report = generateReport(earthquakeCount);
+  const { data, isLoading, isError } = useQuery<{ report: string }>({
+    queryKey: ["ai-report", earthquakeCount],
+    queryFn: async () => {
+      const res = await fetch("/api/ai-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ earthquakeCount }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch report");
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 60 * 2, // 2 hours
+  });
 
   return (
     <motion.div
@@ -48,12 +39,18 @@ export function AIReport({ earthquakeCount }: AIReportProps) {
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-white/20 text-xs">
-          <RefreshCw className="w-3 h-3" />
-          Auto-generated
+          <RefreshCw className={`w-3 h-3 ${isLoading ? "animate-spin" : ""}`} />
+          {isLoading ? "Generating..." : "Auto-generated"}
         </div>
       </div>
 
-      <p className="text-white/45 text-sm leading-relaxed">{report}</p>
+      <p className="text-white/45 text-sm leading-relaxed">
+        {isLoading
+          ? "Connecting to NEBULA Core. Analyzing orbital data, seismic activity, and solar parameters..."
+          : isError
+          ? "Unable to generate AI report at this time. Please check your connection."
+          : data?.report}
+      </p>
     </motion.div>
   );
 }

@@ -21,6 +21,7 @@ import { AsteroidCard } from "@/components/dashboard/asteroid-card";
 import { SolarCard } from "@/components/dashboard/solar-card";
 import { StatsBar } from "@/components/dashboard/stats-bar";
 import { AIReport } from "@/components/dashboard/ai-report";
+import { WeatherWidget } from "@/components/dashboard/weather-widget";
 
 export default function DashboardPage() {
   const { data: earthquakeData } = useQuery({
@@ -76,16 +77,27 @@ export default function DashboardPage() {
             <APODCard />
           </div>
 
-          {/* ISS */}
-          <div>
-            <SectionHeader
-              icon={Satellite}
-              title="ISS Live Tracker"
-              subtitle="Open Notify · Live"
-              color="text-blue-400"
-              live
-            />
-            <ISSTracker />
+          {/* ISS & Weather */}
+          <div className="flex flex-col gap-4">
+            <div>
+              <SectionHeader
+                icon={Satellite}
+                title="ISS Live Tracker"
+                subtitle="Open Notify · Live"
+                color="text-blue-400"
+                live
+              />
+              <ISSTracker />
+            </div>
+            <div>
+              <SectionHeader
+                icon={Thermometer}
+                title="Weather"
+                subtitle="Open-Meteo · Cape Canaveral"
+                color="text-sky-400"
+              />
+              <WeatherWidget />
+            </div>
           </div>
         </div>
 
