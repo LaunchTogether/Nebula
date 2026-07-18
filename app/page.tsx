@@ -330,13 +330,13 @@ export default function HomePage() {
       </section>
 
       {/* Feature Bento Grid */}
-      <section className="relative py-32 px-4 md:px-8 max-w-7xl mx-auto">
+      <section className="relative py-32 px-4 md:px-8 w-full max-w-7xl mx-auto flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto mb-20 max-w-3xl text-center flex flex-col items-center"
+          className="mx-auto mb-20 max-w-3xl text-center flex flex-col items-center justify-center w-full"
         >
           <h2 className="font-serif text-4xl md:text-5xl text-[#fafafa] mb-6 text-center w-full">
             Comprehensive <span className="italic text-[#a1a1aa] pr-2">Insights</span>
@@ -347,7 +347,7 @@ export default function HomePage() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {features.map((feature, i) => {
             const Icon = feature.icon;
             return (
@@ -357,7 +357,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="glass-panel p-8 group"
+                className="glass-panel p-8 group w-full"
               >
                 <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:bg-white/10 transition-colors">
                   <Icon className="w-5 h-5 text-[#d97757]" strokeWidth={1.5} />
