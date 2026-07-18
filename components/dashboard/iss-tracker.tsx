@@ -140,14 +140,14 @@ export function ISSTracker() {
   const lon = parseFloat(data?.iss_position?.longitude || "0");
 
   if (isLoading) {
-    return <div className="glass-card h-64 skeleton" />;
+    return <div className="glass-panel h-64 skeleton" />;
   }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-4"
+      className="glass-panel p-4"
     >
       <ISSGlobe lat={lat} lon={lon} />
 
@@ -156,13 +156,13 @@ export function ISSTracker() {
           icon={MapPin}
           label="Latitude"
           value={`${lat.toFixed(4)}°`}
-          color="text-blue-400"
+          color="text-[#a1a1aa]"
         />
         <StatItem
           icon={MapPin}
           label="Longitude"
           value={`${lon.toFixed(4)}°`}
-          color="text-blue-400"
+          color="text-[#a1a1aa]"
         />
         <StatItem
           icon={ArrowUp}
@@ -174,7 +174,7 @@ export function ISSTracker() {
           icon={Gauge}
           label="Speed"
           value="27,600 km/h"
-          color="text-violet-400"
+          color="text-[#a1a1aa]"
         />
       </div>
 

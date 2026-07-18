@@ -27,12 +27,12 @@ export function AIReport({ earthquakeCount }: AIReportProps) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-4 border border-violet-500/10 bg-gradient-to-r from-violet-500/[0.04] to-blue-500/[0.03]"
+      className="glass-panel p-4 border border-violet-500/10 bg-gradient-to-r from-violet-500/[0.04] to-blue-500/[0.03]"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+            <Sparkles className="w-3.5 h-3.5 text-[#a1a1aa]" />
           </div>
           <span className="text-white/60 font-semibold text-sm">
             Daily Planet Report

@@ -28,14 +28,14 @@ export function APODCard() {
 
   if (isLoading) {
     return (
-      <div className="glass-card h-80 skeleton" aria-busy="true" />
+      <div className="glass-panel h-80 skeleton" aria-busy="true" />
     );
   }
 
   if (!data || data.media_type === "video") {
     return (
-      <div className="glass-card p-6 flex items-center justify-center h-80 text-white/30">
-        <p>Today&apos;s APOD is a video. <a href={data?.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Watch it here</a></p>
+      <div className="glass-panel p-6 flex items-center justify-center h-80 text-white/30">
+        <p>Today&apos;s APOD is a video. <a href={data?.url} target="_blank" rel="noopener noreferrer" className="text-[#a1a1aa] hover:underline">Watch it here</a></p>
       </div>
     );
   }
@@ -53,7 +53,7 @@ export function APODCard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card overflow-hidden"
+        className="glass-panel overflow-hidden"
       >
         {/* Image */}
         <div className="relative h-56 md:h-72 overflow-hidden">

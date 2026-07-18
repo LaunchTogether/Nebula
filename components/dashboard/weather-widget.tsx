@@ -27,7 +27,7 @@ export function WeatherWidget() {
   });
 
   if (isLoading) {
-    return <div className="glass-card h-48 skeleton" />;
+    return <div className="glass-panel h-48 skeleton" />;
   }
 
   if (!data) return null;
@@ -39,7 +39,7 @@ export function WeatherWidget() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-5 relative overflow-hidden"
+      className="glass-panel p-5 relative overflow-hidden"
     >
       <div className="absolute top-0 right-0 p-6 opacity-10">
         {isDay ? <Sun className="w-32 h-32" /> : <Moon className="w-32 h-32" />}
@@ -62,7 +62,7 @@ export function WeatherWidget() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Sunrise className="w-4 h-4 text-orange-400" />
+              <Sunrise className="w-4 h-4 text-[#a1a1aa]" />
               <div>
                 <div className="text-white/30 text-[10px] uppercase tracking-wider">Sunrise</div>
                 <div className="text-white/80 text-sm font-mono">{format(new Date(daily.sunrise[0]), "HH:mm")}</div>
@@ -86,7 +86,7 @@ export function WeatherWidget() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Droplets className="w-4 h-4 text-blue-400" />
+              <Droplets className="w-4 h-4 text-[#a1a1aa]" />
               <div>
                 <div className="text-white/30 text-[10px] uppercase tracking-wider">Humidity</div>
                 <div className="text-white/80 text-sm font-mono">{current.relative_humidity_2m}%</div>

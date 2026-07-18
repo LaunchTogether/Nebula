@@ -72,7 +72,7 @@ export function SolarCard() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-5 space-y-5"
+      className="glass-panel p-5 space-y-5"
     >
       <KPGauge value={kpIndex} />
 
@@ -82,10 +82,10 @@ export function SolarCard() {
       <div>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5 text-xs text-white/30">
-            <Activity className="w-3.5 h-3.5 text-emerald-400" />
+            <Activity className="w-3.5 h-3.5 text-[#a1a1aa]" />
             Aurora Probability
           </div>
-          <span className="text-emerald-400 font-mono text-sm font-semibold">
+          <span className="text-[#a1a1aa] font-mono text-sm font-semibold">
             {auroraProb}%
           </span>
         </div>
@@ -103,12 +103,12 @@ export function SolarCard() {
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-yellow-500/5 border border-yellow-500/10 p-3">
           <div className="flex items-center gap-1.5 mb-1">
-            <Sun className="w-3 h-3 text-yellow-400" />
+            <Sun className="w-3 h-3 text-[#a1a1aa]" />
             <span className="text-[10px] text-white/30 uppercase tracking-wide">
               Solar Flares
             </span>
           </div>
-          <div className="text-lg font-bold font-mono text-yellow-400">
+          <div className="text-lg font-bold font-mono text-[#a1a1aa]">
             {solarFlares}
           </div>
           <div className="text-[10px] text-white/20">Today</div>

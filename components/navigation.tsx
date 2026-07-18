@@ -14,12 +14,14 @@ import {
   Activity,
   Rocket,
   Star,
+  Newspaper,
 } from "lucide-react";
 import { SearchModal } from "@/components/ui/search-modal";
 
 const navItems = [
   { href: "/", label: "Home", icon: Star },
   { href: "/dashboard", label: "Dashboard", icon: Globe },
+  { href: "/news", label: "News", icon: Newspaper },
   { href: "/space", label: "Space", icon: Satellite },
   { href: "/earth", label: "Earth", icon: Activity },
   { href: "/launches", label: "Launches", icon: Rocket },
@@ -48,7 +50,6 @@ export function Navigation() {
           hour12: false,
           hour: "2-digit",
           minute: "2-digit",
-          second: "2-digit",
         })
       );
     };
@@ -72,120 +73,128 @@ export function Navigation() {
   return (
     <>
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-      <motion.nav
+      
+      {/* Floating Header */}
+      <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-black/60 backdrop-blur-2xl border-b border-white/[0.06]"
-            : "bg-transparent"
-        }`}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 flex justify-center pt-4 md:pt-6 px-4`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative w-8 h-8">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 opacity-80 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute inset-0.5 rounded-full bg-black flex items-center justify-center">
-                  <Globe className="w-4 h-4 text-blue-400" />
-                </div>
-              </div>
-              <span
-                className="font-bold text-lg tracking-wider gradient-text-nebula"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                NEBULA
-              </span>
-            </Link>
-
-            {/* Desktop nav */}
-            <div className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                        : "text-white/50 hover:text-white/90 hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {item.label}
-                  </Link>
-                );
-              })}
+        <div 
+          className={`w-full max-w-7xl flex items-center justify-between transition-all duration-500 rounded-2xl ${
+            scrolled
+              ? "bg-[#121212]/70 backdrop-blur-3xl border border-white/10 px-4 md:px-6 py-3 shadow-2xl"
+              : "bg-transparent border-transparent px-2 md:px-4 py-4"
+          }`}
+        >
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-7 h-7 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-[#d97757] opacity-20 blur-md group-hover:opacity-40 transition-opacity duration-500" />
+              <Globe className="w-5 h-5 text-[#d97757] relative z-10" strokeWidth={1.5} />
             </div>
+            <span className="font-serif text-xl tracking-tight text-white group-hover:text-[#e6dfd9] transition-colors">
+              Nebula.
+            </span>
+          </Link>
 
-            {/* Right side */}
-            <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span
-                  className="text-xs font-mono text-white/40"
-                  aria-label="UTC Time"
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative px-4 py-2 rounded-full text-sm font-sans transition-all duration-300 ${
+                    isActive
+                      ? "text-[#fafafa] font-medium"
+                      : "text-[#71717a] hover:text-[#d97757]"
+                  }`}
                 >
-                  UTC {time}
-                </span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-pill"
+                      className="absolute inset-0 bg-white/5 border border-white/10 rounded-full -z-10"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Right side controls */}
+          <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setSearchOpen(true)}>
+              <Search className="w-4 h-4 text-[#71717a] group-hover:text-[#fafafa] transition-colors" />
+              <div className="flex items-center gap-1">
+                <kbd className="hidden lg:inline-flex items-center justify-center px-2 py-0.5 text-[10px] font-mono text-[#71717a] bg-white/5 border border-white/10 rounded">
+                  ⌘K
+                </kbd>
               </div>
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-white/40 hover:text-white/80 hover:bg-white/[0.06] transition-all"
-                aria-label="Search"
-              >
-                <Search className="w-4 h-4" />
-              </button>
             </div>
+            
+            <div className="w-[1px] h-4 bg-white/10" />
 
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60"
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <Menu className="w-4 h-4" />
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="live-dot" />
+              <span
+                className="text-xs font-mono text-[#a1a1aa] tracking-widest"
+                aria-label="UTC Time"
+              >
+                {time}
+              </span>
+            </div>
           </div>
-        </div>
-      </motion.nav>
 
-      {/* Mobile menu */}
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#a1a1aa] hover:text-white transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
+        </div>
+      </motion.header>
+
+      {/* Mobile menu overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-40 bg-black/90 backdrop-blur-2xl border-b border-white/[0.06] md:hidden"
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-x-4 top-24 z-40 bg-[#121212]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl p-4 md:hidden overflow-hidden"
           >
-            <div className="p-4 space-y-1">
-              {navItems.map((item) => {
+            <div className="flex flex-col space-y-1">
+              {navItems.map((item, i) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
                 return (
-                  <Link
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
                     key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-blue-500/10 text-blue-400"
-                        : "text-white/50 hover:text-white/80 hover:bg-white/[0.04]"
-                    }`}
                   >
-                    <Icon className="w-4 h-4" />
-                    {item.label}
-                  </Link>
+                    <Link
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-sans transition-all ${
+                        isActive
+                          ? "bg-white/5 text-[#fafafa] border border-white/5"
+                          : "text-[#71717a] hover:text-[#d97757] hover:bg-white/[0.02]"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" strokeWidth={isActive ? 2 : 1.5} />
+                      {item.label}
+                    </Link>
+                  </motion.div>
                 );
               })}
             </div>

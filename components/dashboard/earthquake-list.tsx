@@ -24,9 +24,9 @@ interface EarthquakeFeature {
 
 function getMagColor(mag: number) {
   if (mag >= 7) return { text: "text-red-400", bg: "bg-red-500", ring: "ring-red-500/30" };
-  if (mag >= 6) return { text: "text-orange-400", bg: "bg-orange-500", ring: "ring-orange-500/30" };
-  if (mag >= 5) return { text: "text-yellow-400", bg: "bg-yellow-500", ring: "ring-yellow-500/30" };
-  return { text: "text-emerald-400", bg: "bg-emerald-500", ring: "ring-emerald-500/20" };
+  if (mag >= 6) return { text: "text-[#a1a1aa]", bg: "bg-orange-500", ring: "ring-orange-500/30" };
+  if (mag >= 5) return { text: "text-[#a1a1aa]", bg: "bg-yellow-500", ring: "ring-yellow-500/30" };
+  return { text: "text-[#a1a1aa]", bg: "bg-emerald-500", ring: "ring-emerald-500/20" };
 }
 
 function MagBadge({ mag }: { mag: number }) {
@@ -77,7 +77,7 @@ export function EarthquakeList() {
   }, [data, permission, sendNotification]);
 
   if (isLoading) {
-    return <div className="glass-card h-64 skeleton" />;
+    return <div className="glass-panel h-64 skeleton" />;
   }
 
   return (
@@ -85,7 +85,7 @@ export function EarthquakeList() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card overflow-hidden"
+        className="glass-panel overflow-hidden"
       >
         <div className="flex items-center justify-between p-3 border-b border-white/[0.03]">
           <span className="text-white/60 text-xs font-semibold uppercase tracking-widest pl-2">Recent Quakes</span>
@@ -129,7 +129,7 @@ export function EarthquakeList() {
                       Depth: {quake.geometry.coordinates[2].toFixed(1)}km
                     </span>
                     {quake.properties.tsunami === 1 && (
-                      <span className="flex items-center gap-0.5 text-[10px] text-blue-400 font-medium">
+                      <span className="flex items-center gap-0.5 text-[10px] text-[#a1a1aa] font-medium">
                         <Waves className="w-2.5 h-2.5" />
                         Tsunami
                       </span>
@@ -158,7 +158,7 @@ export function EarthquakeList() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card p-6 max-w-md w-full border border-white/10"
+              className="glass-panel p-6 max-w-md w-full border border-white/10"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -238,7 +238,7 @@ export function EarthquakeList() {
                 </div>
 
                 {selected.properties.tsunami === 1 && (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm">
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[#a1a1aa] text-sm">
                     <Waves className="w-4 h-4" />
                     Tsunami warning issued for this event
                   </div>

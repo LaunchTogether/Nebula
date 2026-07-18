@@ -46,7 +46,7 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
 
   return (
     <div
-      className="text-emerald-400 font-mono text-sm font-semibold"
+      className="text-[#a1a1aa] font-mono text-sm font-semibold"
       aria-live="polite"
     >
       {timeLeft}
@@ -62,7 +62,7 @@ export function SpaceXCard() {
   });
 
   if (isLoading) {
-    return <div className="glass-card h-72 skeleton" />;
+    return <div className="glass-panel h-72 skeleton" />;
   }
 
   const latest = data?.latest;
@@ -72,7 +72,7 @@ export function SpaceXCard() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-5 space-y-4"
+      className="glass-panel p-5 space-y-4"
     >
       {/* Latest Launch */}
       {latest && (
@@ -104,7 +104,7 @@ export function SpaceXCard() {
                   className="w-8 h-8 object-contain"
                 />
               ) : (
-                <Rocket className="w-4 h-4 text-violet-400" />
+                <Rocket className="w-4 h-4 text-[#a1a1aa]" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -113,7 +113,7 @@ export function SpaceXCard() {
                   {latest.name}
                 </h4>
                 {latest.success === true && (
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                  <CheckCircle className="w-3.5 h-3.5 text-[#a1a1aa] flex-shrink-0" />
                 )}
                 {latest.success === false && (
                   <XCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
@@ -165,7 +165,7 @@ export function SpaceXCard() {
                   className="w-8 h-8 object-contain"
                 />
               ) : (
-                <Rocket className="w-4 h-4 text-emerald-400" />
+                <Rocket className="w-4 h-4 text-[#a1a1aa]" />
               )}
             </div>
             <div className="flex-1 min-w-0">

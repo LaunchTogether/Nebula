@@ -33,118 +33,147 @@ export default function DashboardPage() {
   const totalQuakes = earthquakeData?.features?.length || 0;
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4 md:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen pt-24 pb-16 px-4 md:px-6 lg:px-8 selection:bg-white/10">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-4"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="badge-live">Live Feed</div>
-            <span className="text-white/20 text-xs">
-              Auto-refreshing · Data from NASA, SpaceX, USGS, NOAA
-            </span>
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+                <div className="live-dot" />
+                <span className="text-[10px] font-medium tracking-widest text-[#a1a1aa] uppercase">
+                  Live Feed
+                </span>
+              </div>
+              <span className="text-[#71717a] text-xs font-medium tracking-wide">
+                NASA · USGS · NOAA
+              </span>
+            </div>
+            <h1 className="font-serif text-4xl md:text-5xl text-[#fafafa] tracking-tight">
+              Planet <span className="italic text-[#a1a1aa]">Intelligence</span>
+            </h1>
           </div>
-          <h1
-            className="text-3xl md:text-4xl font-bold text-white/90"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            Planet{" "}
-            <span className="gradient-text-nebula">Intelligence</span>
-          </h1>
+          <StatsBar earthquakeCount={totalQuakes} />
         </motion.div>
 
-        {/* Stats Bar */}
-        <StatsBar earthquakeCount={totalQuakes} />
-
         {/* AI Report */}
-        <div className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        >
           <AIReport earthquakeCount={totalQuakes} />
-        </div>
+        </motion.div>
 
         {/* Main grid */}
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* APOD — large */}
-          <div className="lg:col-span-2">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-2 space-y-4"
+          >
             <SectionHeader
               icon={Star}
               title="Astronomy Picture of the Day"
-              subtitle="NASA · Daily"
-              color="text-amber-400"
+              subtitle="NASA"
             />
             <APODCard />
-          </div>
+          </motion.div>
 
           {/* ISS & Weather */}
-          <div className="flex flex-col gap-4">
-            <div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col gap-6"
+          >
+            <div className="space-y-4">
               <SectionHeader
                 icon={Satellite}
-                title="ISS Live Tracker"
-                subtitle="Open Notify · Live"
-                color="text-blue-400"
+                title="ISS Tracker"
+                subtitle="Live"
                 live
               />
               <ISSTracker />
             </div>
-            <div>
+            <div className="space-y-4">
               <SectionHeader
                 icon={Thermometer}
                 title="Weather"
-                subtitle="Open-Meteo · Cape Canaveral"
-                color="text-sky-400"
+                subtitle="Local"
               />
               <WeatherWidget />
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Second row */}
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-4"
+          >
             <SectionHeader
               icon={Rocket}
               title="SpaceX Launches"
-              subtitle="Latest & Upcoming"
-              color="text-violet-400"
+              subtitle="Latest"
             />
             <SpaceXCard />
-          </div>
-          <div>
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-4"
+          >
             <SectionHeader
               icon={AlertTriangle}
-              title="Near-Earth Asteroids"
-              subtitle="NASA NEO · Today"
-              color="text-orange-400"
+              title="Near-Earth Objects"
+              subtitle="NASA NEO"
             />
             <AsteroidCard />
-          </div>
+          </motion.div>
         </div>
 
         {/* Third row */}
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-2 space-y-4"
+          >
             <SectionHeader
               icon={Activity}
               title="Earthquake Monitor"
-              subtitle="USGS · M4.0+ Last 7 Days"
-              color="text-emerald-400"
+              subtitle="USGS"
               live
             />
             <EarthquakeList />
-          </div>
-          <div>
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-4"
+          >
             <SectionHeader
               icon={Zap}
               title="Solar Activity"
               subtitle="NOAA SWPC"
-              color="text-yellow-400"
               live
             />
             <SolarCard />
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
@@ -155,25 +184,21 @@ function SectionHeader({
   icon: Icon,
   title,
   subtitle,
-  color,
   live = false,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   title: string;
   subtitle: string;
-  color: string;
   live?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between mb-3">
-      <div className="flex items-center gap-2">
-        <Icon className={`w-4 h-4 ${color}`} />
-        <span className="text-white/70 font-semibold text-sm">{title}</span>
+    <div className="flex items-center justify-between px-2">
+      <div className="flex items-center gap-2.5">
+        <Icon className="w-4 h-4 text-[#d97757]" strokeWidth={1.5} />
+        <span className="text-[#fafafa] font-medium tracking-wide">{title}</span>
       </div>
-      <div className="flex items-center gap-1.5 text-white/25 text-xs">
-        {live && (
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        )}
+      <div className="flex items-center gap-2 text-[#71717a] text-xs font-medium tracking-wider uppercase">
+        {live && <div className="live-dot" />}
         {subtitle}
       </div>
     </div>

@@ -55,7 +55,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
         <script
@@ -73,11 +73,18 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>
-        <StarsBackground />
+      <body className="antialiased selection:bg-white/20 selection:text-white">
+        {/* Subtle Background Glows */}
+        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="glow-blob glow-blue w-[800px] h-[800px] top-[-200px] left-[-200px]" />
+          <div className="glow-amber w-[600px] h-[600px] bottom-[-100px] right-[-100px] glow-blob" />
+        </div>
+        
         <Providers>
-          <Navigation />
-          <main className="relative z-10">{children}</main>
+          <div className="relative z-10 min-h-screen flex flex-col">
+            <Navigation />
+            <main className="flex-1">{children}</main>
+          </div>
         </Providers>
       </body>
     </html>

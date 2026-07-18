@@ -35,7 +35,7 @@ export function AsteroidCard() {
   });
 
   if (isLoading) {
-    return <div className="glass-card h-64 skeleton" />;
+    return <div className="glass-panel h-64 skeleton" />;
   }
 
   const asteroids = data?.asteroids || [];
@@ -45,12 +45,12 @@ export function AsteroidCard() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-4"
+      className="glass-panel p-4"
     >
       {/* Summary */}
       <div className="grid grid-cols-2 gap-2 mb-4">
         <div className="rounded-xl bg-orange-500/5 border border-orange-500/10 p-3 text-center">
-          <div className="text-2xl font-bold font-mono text-orange-400 mb-0.5">
+          <div className="text-2xl font-bold font-mono text-[#a1a1aa] mb-0.5">
             {hazardous.length}
           </div>
           <div className="text-white/30 text-[10px] uppercase tracking-wide">
@@ -88,7 +88,7 @@ export function AsteroidCard() {
             >
               <div className="flex-shrink-0">
                 {isHazardous ? (
-                  <AlertTriangle className="w-4 h-4 text-orange-400" />
+                  <AlertTriangle className="w-4 h-4 text-[#a1a1aa]" />
                 ) : (
                   <Shield className="w-4 h-4 text-white/20" />
                 )}
