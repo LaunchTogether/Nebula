@@ -74,17 +74,17 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased selection:bg-white/20 selection:text-white">
+      <body className="antialiased selection:bg-white/20 selection:text-white w-full overflow-x-hidden">
         {/* Subtle Background Glows */}
-        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none w-full">
           <div className="glow-blob glow-blue w-[800px] h-[800px] top-[-200px] left-[-200px]" />
           <div className="glow-amber w-[600px] h-[600px] bottom-[-100px] right-[-100px] glow-blob" />
         </div>
         
         <Providers>
-          <div className="relative z-10 min-h-screen flex flex-col">
+          <div className="relative z-10 min-h-screen flex flex-col w-full">
             <Navigation />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 w-full flex flex-col items-center">{children}</main>
             <Footer />
           </div>
         </Providers>
