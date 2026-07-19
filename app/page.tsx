@@ -41,7 +41,55 @@ function project(lat: number, lon: number, spin: number): Vec3 {
   };
 }
 
-/* ---------- Signature: line-art wireframe Earth ---------- */
+/* ---------- Signature: dotted-sphere Earth (calm, premium) ---------- */
+
+type Dot = { x: number; y: number; z: number; land: boolean };
+
+// Evenly distribute N points on a unit sphere (Fibonacci lattice), then flag
+// the ones that fall inside coarse continent regions as "land" (brighter).
+function buildSphere(count: number): Dot[] {
+  const D2R = Math.PI / 180;
+  // Continent centres: [lat, lon, angularRadius°] — a point within radius = land.
+  const land: Array<[number, number, number]> = [
+    [54, -108, 26], // N. America
+    [39, -98, 15], // N. America (mid)
+    [-12, -58, 24], // S. America
+    [52, 12, 17], // Europe
+    [8, 20, 30], // Africa
+    [-4, 24, 22], // Central/S. Africa
+    [58, 90, 34], // Asia (north)
+    [28, 78, 18], // India
+    [40, 116, 16], // E. Asia
+    [-25, 133, 15], // Australia
+  ];
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  const dots: Dot[] = [];
+  for (let i = 0; i < count; i++) {
+    const y = 1 - (i / (count - 1)) * 2; // 1 -> -1
+    const rad = Math.sqrt(1 - y * y);
+    const theta = i * golden;
+    const x = Math.cos(theta) * rad;
+    const z = Math.sin(theta) * rad;
+    // lat/lon of this point to test against continent centres
+    const lat = Math.asin(y);
+    const lon = Math.atan2(z, x);
+    let isLand = false;
+    for (const [clat, clon, cr] of land) {
+      const dlat = lat - clat * D2R;
+      let dlon = lon - clon * D2R;
+      if (dlon > Math.PI) dlon -= 2 * Math.PI;
+      if (dlon < -Math.PI) dlon += 2 * Math.PI;
+      // rough angular distance (flat-ish, good enough for a stylised map)
+      const d = Math.sqrt(dlat * dlat + dlon * dlon * Math.cos(lat) * Math.cos(lat));
+      if (d < cr * D2R) {
+        isLand = true;
+        break;
+      }
+    }
+    dots.push({ x, y, z, land: isLand });
+  }
+  return dots;
+}
 
 function WireframeGlobe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -65,12 +113,10 @@ function WireframeGlobe() {
     // Theme colors, refreshed whenever data-theme changes
     let colAccent = "#5e8bff";
     let colCyan = "#37e0e8";
-    let colRed = "#ff5230";
     let colLine = "#93a0c0";
     const refreshColors = () => {
       colAccent = readVar("--accent") || colAccent;
       colCyan = readVar("--accent-cyan") || colCyan;
-      colRed = readVar("--accent-red") || colRed;
       colLine = readVar("--text-dim") || colLine;
     };
     refreshColors();
@@ -80,36 +126,7 @@ function WireframeGlobe() {
       attributeFilter: ["data-theme"],
     });
 
-    const D2R = Math.PI / 180;
-
-    // Coarse land blobs -> scatter dots so the sphere reads as Earth
-    const landBlobs: Array<[number, number, number, number]> = [
-      // [lat, lon, spreadLat, count]
-      [50, -100, 26, 34], // N. America
-      [-10, -58, 22, 26], // S. America
-      [50, 15, 20, 30], // Europe
-      [5, 20, 26, 40], // Africa
-      [55, 90, 30, 46], // Asia
-      [-25, 133, 14, 16], // Australia
-    ];
-    const dots: Array<{ lat: number; lon: number }> = [];
-    landBlobs.forEach(([blat, blon, spread, count]) => {
-      for (let i = 0; i < count; i++) {
-        dots.push({
-          lat: (blat + (Math.random() - 0.5) * spread) * D2R,
-          lon: (blon + (Math.random() - 0.5) * spread * 1.6) * D2R,
-        });
-      }
-    });
-
-    // Surface pings (earthquake-style pulses) at fixed coordinates
-    const pings = [
-      { lat: 38 * D2R, lon: 142 * D2R, phase: 0 }, // Japan trench
-      { lat: -33 * D2R, lon: -71 * D2R, phase: 1.7 }, // Chile
-      { lat: 37 * D2R, lon: -122 * D2R, phase: 3.1 }, // California
-      { lat: 28 * D2R, lon: 84 * D2R, phase: 4.6 }, // Himalaya
-    ];
-
+    const dots = buildSphere(2200);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let spin = -0.4;
@@ -119,132 +136,96 @@ function WireframeGlobe() {
     const draw = () => {
       ctx.clearRect(0, 0, SIZE, SIZE);
 
-      // faint disc to seat the wireframe
-      const disc = ctx.createRadialGradient(cx, cy - r * 0.2, 0, cx, cy, r);
-      disc.addColorStop(0, hexA(colAccent, 0.05));
-      disc.addColorStop(1, hexA(colAccent, 0));
+      const cosS = Math.cos(spin);
+      const sinS = Math.sin(spin);
+
+      // soft atmosphere glow behind the sphere
+      const halo = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.25);
+      halo.addColorStop(0, hexA(colAccent, 0.14));
+      halo.addColorStop(1, hexA(colAccent, 0));
       ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle = disc;
+      ctx.arc(cx, cy, r * 1.25, 0, Math.PI * 2);
+      ctx.fillStyle = halo;
       ctx.fill();
 
-      // limb (sphere outline)
+      // inner sphere body — subtle lit gradient, offset toward top-left
+      const body = ctx.createRadialGradient(
+        cx - r * 0.35,
+        cy - r * 0.35,
+        0,
+        cx,
+        cy,
+        r
+      );
+      body.addColorStop(0, hexA(colAccent, 0.1));
+      body.addColorStop(0.7, hexA(colAccent, 0.03));
+      body.addColorStop(1, hexA(colAccent, 0));
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.strokeStyle = hexA(colLine, 0.35);
+      ctx.fillStyle = body;
+      ctx.fill();
+
+      // dotted surface — front hemisphere only, depth-shaded
+      for (const d of dots) {
+        // rotate around Y
+        const x = d.x * cosS + d.z * sinS;
+        const z = -d.x * sinS + d.z * cosS;
+        if (z <= 0.02) continue; // back face
+        const sx = cx + x * r;
+        const sy = cy - d.y * r;
+        const depth = 0.25 + z * 0.75; // 0..1 front-lit
+        if (d.land) {
+          ctx.beginPath();
+          ctx.arc(sx, sy, 1.1 * depth + 0.35, 0, Math.PI * 2);
+          ctx.fillStyle = hexA(colAccent, 0.85 * depth);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(sx, sy, 0.75 * depth + 0.2, 0, Math.PI * 2);
+          ctx.fillStyle = hexA(colLine, 0.28 * depth);
+          ctx.fill();
+        }
+      }
+
+      // crisp limb to define the edge
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = hexA(colLine, 0.18);
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // parallels (latitude rings)
-      for (let lat = -60; lat <= 60; lat += 30) {
-        ctx.beginPath();
-        let started = false;
-        for (let lon = -180; lon <= 180; lon += 6) {
-          const p = project(lat * D2R, lon * D2R, spin);
-          const sx = cx + p.x * r;
-          const sy = cy - p.y * r;
-          if (p.z >= -0.02) {
-            if (!started) {
-              ctx.moveTo(sx, sy);
-              started = true;
-            } else ctx.lineTo(sx, sy);
-          } else {
-            started = false;
-          }
-        }
-        ctx.strokeStyle = hexA(colLine, lat === 0 ? 0.22 : 0.12);
-        ctx.lineWidth = lat === 0 ? 1 : 0.6;
-        ctx.stroke();
-      }
-
-      // meridians (longitude arcs) — rotate with spin
-      for (let lon = -180; lon < 180; lon += 30) {
-        ctx.beginPath();
-        let started = false;
-        for (let lat = -90; lat <= 90; lat += 4) {
-          const p = project(lat * D2R, lon * D2R, spin);
-          const sx = cx + p.x * r;
-          const sy = cy - p.y * r;
-          if (p.z >= -0.02) {
-            if (!started) {
-              ctx.moveTo(sx, sy);
-              started = true;
-            } else ctx.lineTo(sx, sy);
-          } else {
-            started = false;
-          }
-        }
-        ctx.strokeStyle = hexA(colLine, 0.1);
-        ctx.lineWidth = 0.6;
-        ctx.stroke();
-      }
-
-      // continent dots (front hemisphere only, depth-shaded)
-      dots.forEach((d) => {
-        const p = project(d.lat, d.lon, spin);
-        if (p.z <= 0.02) return;
-        const sx = cx + p.x * r;
-        const sy = cy - p.y * r;
-        const depth = 0.35 + p.z * 0.65;
-        ctx.beginPath();
-        ctx.arc(sx, sy, 1.15 * depth + 0.3, 0, Math.PI * 2);
-        ctx.fillStyle = hexA(colAccent, 0.5 * depth);
-        ctx.fill();
-      });
-
-      // surface pings
-      pings.forEach((pg) => {
-        const p = project(pg.lat, pg.lon, spin);
-        if (p.z <= 0.05) return;
-        const sx = cx + p.x * r;
-        const sy = cy - p.y * r;
-        const cycle = (t * 0.02 + pg.phase) % 3;
-        if (cycle < 1.4) {
-          const prog = cycle / 1.4;
-          ctx.beginPath();
-          ctx.arc(sx, sy, 2 + prog * 12, 0, Math.PI * 2);
-          ctx.strokeStyle = hexA(colRed, (1 - prog) * 0.7);
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-        ctx.beginPath();
-        ctx.arc(sx, sy, 1.6, 0, Math.PI * 2);
-        ctx.fillStyle = hexA(colRed, 0.9);
-        ctx.fill();
-      });
-
-      // tilted orbital ring + ISS marker
+      // one elegant orbital ring, tilted
       ctx.save();
       ctx.translate(cx, cy);
-      ctx.rotate(-0.35);
-      ctx.scale(1, 0.32);
+      ctx.rotate(-0.42);
+      ctx.scale(1, 0.3);
       ctx.beginPath();
-      ctx.arc(0, 0, r * 1.32, 0, Math.PI * 2);
-      ctx.strokeStyle = hexA(colCyan, 0.28);
+      ctx.arc(0, 0, r * 1.28, 0, Math.PI * 2);
+      ctx.strokeStyle = hexA(colCyan, 0.32);
       ctx.lineWidth = 1;
       ctx.stroke();
       ctx.restore();
 
-      // ISS travelling along the ring
-      const oa = t * 0.012;
-      const ox = Math.cos(oa) * r * 1.32;
-      const oy = Math.sin(oa) * r * 1.32;
-      const rot = -0.35;
-      const isx = cx + (ox * Math.cos(rot) - oy * 0.32 * Math.sin(rot));
-      const isy = cy + (ox * Math.sin(rot) + oy * 0.32 * Math.cos(rot));
-      const glow = ctx.createRadialGradient(isx, isy, 0, isx, isy, 8);
-      glow.addColorStop(0, hexA(colCyan, 0.8));
+      // ISS travelling along the ring, with a soft glow
+      const oa = t * 0.01;
+      const ox = Math.cos(oa) * r * 1.28;
+      const oy = Math.sin(oa) * r * 1.28;
+      const rot = -0.42;
+      const isx = cx + (ox * Math.cos(rot) - oy * 0.3 * Math.sin(rot));
+      const isy = cy + (ox * Math.sin(rot) + oy * 0.3 * Math.cos(rot));
+      const glow = ctx.createRadialGradient(isx, isy, 0, isx, isy, 9);
+      glow.addColorStop(0, hexA(colCyan, 0.85));
       glow.addColorStop(1, hexA(colCyan, 0));
       ctx.beginPath();
-      ctx.arc(isx, isy, 8, 0, Math.PI * 2);
+      ctx.arc(isx, isy, 9, 0, Math.PI * 2);
       ctx.fillStyle = glow;
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(isx, isy, 2.4, 0, Math.PI * 2);
+      ctx.arc(isx, isy, 2.2, 0, Math.PI * 2);
       ctx.fillStyle = colCyan;
       ctx.fill();
 
-      spin += 0.0016;
+      spin += 0.0014;
       t += 1;
       if (!reduceMotion) animId = requestAnimationFrame(draw);
     };
@@ -261,7 +242,7 @@ function WireframeGlobe() {
       ref={canvasRef}
       style={{ width: 460, height: 460 }}
       className="max-w-full h-auto"
-      aria-label="Rotating wireframe globe with orbital track and live surface events"
+      aria-label="Rotating dotted globe of Earth with a live orbital track"
     />
   );
 }
