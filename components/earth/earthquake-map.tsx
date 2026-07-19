@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { formatDistanceToNow } from "date-fns";
+import { magnitudeColor } from "@/lib/dataviz";
 
 interface EarthquakeFeature {
   id: string;
@@ -16,13 +17,6 @@ interface EarthquakeFeature {
   geometry: {
     coordinates: [number, number, number];
   };
-}
-
-function getMagColor(mag: number) {
-  if (mag >= 7) return "#ef4444";
-  if (mag >= 6) return "#f97316";
-  if (mag >= 5) return "#f59e0b";
-  return "#10b981";
 }
 
 function getMagRadius(mag: number) {
@@ -52,7 +46,7 @@ export default function EarthquakeMap({
         />
         {earthquakes.map((quake) => {
           const [lon, lat] = quake.geometry.coordinates;
-          const color = getMagColor(quake.properties.mag);
+          const color = magnitudeColor(quake.properties.mag);
           const radius = getMagRadius(quake.properties.mag);
 
           return (

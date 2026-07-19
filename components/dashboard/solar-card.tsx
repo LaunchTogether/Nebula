@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Zap, Sun, Activity } from "lucide-react";
+import { kpColor } from "@/lib/dataviz";
 
 // NOAA data is public but has CORS issues from browser, so we use simulated live-looking data
 // In production, add a proper /api/solar route with NOAA SWPC data
@@ -9,21 +10,14 @@ const KP_LEVELS = ["Quiet", "Quiet", "Unsettled", "Active", "Minor Storm", "Mode
 
 function KPGauge({ value }: { value: number }) {
   const percentage = (value / 9) * 100;
-  const color =
-    value <= 2
-      ? "#10b981"
-      : value <= 3
-      ? "#f59e0b"
-      : value <= 5
-      ? "#f97316"
-      : "#ef4444";
+  const color = kpColor(value);
 
   return (
     <div className="relative">
       <div className="flex items-end justify-between mb-2">
         <div>
           <div
-            className="text-4xl font-bold font-mono"
+            className="tabular text-4xl font-bold font-mono"
             style={{ color }}
           >
             {value}

@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { Activity, Waves, AlertTriangle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { MagnitudeChart } from "@/components/earth/magnitude-chart";
+import { DepthChart } from "@/components/earth/depth-chart";
+import { MAGNITUDE_BANDS } from "@/lib/dataviz";
 
 // Leaflet must be dynamically imported (no SSR)
 const EarthquakeMap = dynamic(
@@ -113,9 +115,10 @@ export default function EarthPage() {
           ))}
         </div>
 
-        {/* Distribution chart */}
-        <div className="mb-6">
+        {/* Distribution + relationship charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <MagnitudeChart earthquakes={quakes} />
+          <DepthChart earthquakes={quakes} />
         </div>
 
         {/* Map */}
@@ -126,22 +129,15 @@ export default function EarthPage() {
               Interactive Seismic Map
             </span>
             <div className="ml-auto flex items-center gap-3 text-xs text-[var(--text-faint)]">
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                M4-5
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block" />
-                M5-6
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />
-                M6-7
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
-                M7+
-              </span>
+              {MAGNITUDE_BANDS.map((b) => (
+                <span key={b.key} className="flex items-center gap-1">
+                  <span
+                    className="w-2 h-2 rounded-full inline-block"
+                    style={{ backgroundColor: b.color }}
+                  />
+                  {b.key}
+                </span>
+              ))}
             </div>
           </div>
           <EarthquakeMap earthquakes={quakes} />
