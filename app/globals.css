@@ -343,6 +343,47 @@ body {
   font-size: 14px;
 }
 
+/* ============================================================
+   3D globe marker labels (drei Html overlays)
+   ============================================================ */
+.globe-tip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 9px;
+  max-width: 180px;
+  border-radius: 10px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--panel-shadow);
+  transform: translateY(-14px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.globe-tip-mag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+}
+.globe-tip-place {
+  font-size: 11px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.globe-iss {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--accent-cyan);
+  background: color-mix(in srgb, var(--accent-cyan) 12%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 40%, transparent);
+  padding: 2px 6px;
+  border-radius: 999px;
+  transform: translate(10px, -10px);
+  pointer-events: none;
+}
+
 /* Divider */
 .hairline {
   height: 1px;

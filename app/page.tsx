@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
@@ -14,238 +15,12 @@ import {
   Newspaper,
 } from "lucide-react";
 
-/* ---------- color helpers (read theme tokens from CSS vars) ---------- */
-
-function readVar(name: string): string {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-// #rrggbb -> rgba(r,g,b,a)
-function hexA(hex: string, a: number): string {
-  const h = hex.replace("#", "");
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
-
-type Vec3 = { x: number; y: number; z: number };
-
-// project a lat/lon (radians) point on a unit sphere, rotated by `spin` around Y
-function project(lat: number, lon: number, spin: number): Vec3 {
-  const l = lon + spin;
-  return {
-    x: Math.cos(lat) * Math.sin(l),
-    y: Math.sin(lat),
-    z: Math.cos(lat) * Math.cos(l),
-  };
-}
-
-/* ---------- Signature: dotted-sphere Earth (calm, premium) ---------- */
-
-type Dot = { x: number; y: number; z: number; land: boolean };
-
-// Evenly distribute N points on a unit sphere (Fibonacci lattice), then flag
-// the ones that fall inside coarse continent regions as "land" (brighter).
-function buildSphere(count: number): Dot[] {
-  const D2R = Math.PI / 180;
-  // Continent centres: [lat, lon, angularRadius°] — a point within radius = land.
-  const land: Array<[number, number, number]> = [
-    [54, -108, 26], // N. America
-    [39, -98, 15], // N. America (mid)
-    [-12, -58, 24], // S. America
-    [52, 12, 17], // Europe
-    [8, 20, 30], // Africa
-    [-4, 24, 22], // Central/S. Africa
-    [58, 90, 34], // Asia (north)
-    [28, 78, 18], // India
-    [40, 116, 16], // E. Asia
-    [-25, 133, 15], // Australia
-  ];
-  const golden = Math.PI * (3 - Math.sqrt(5));
-  const dots: Dot[] = [];
-  for (let i = 0; i < count; i++) {
-    const y = 1 - (i / (count - 1)) * 2; // 1 -> -1
-    const rad = Math.sqrt(1 - y * y);
-    const theta = i * golden;
-    const x = Math.cos(theta) * rad;
-    const z = Math.sin(theta) * rad;
-    // lat/lon of this point to test against continent centres
-    const lat = Math.asin(y);
-    const lon = Math.atan2(z, x);
-    let isLand = false;
-    for (const [clat, clon, cr] of land) {
-      const dlat = lat - clat * D2R;
-      let dlon = lon - clon * D2R;
-      if (dlon > Math.PI) dlon -= 2 * Math.PI;
-      if (dlon < -Math.PI) dlon += 2 * Math.PI;
-      // rough angular distance (flat-ish, good enough for a stylised map)
-      const d = Math.sqrt(dlat * dlat + dlon * dlon * Math.cos(lat) * Math.cos(lat));
-      if (d < cr * D2R) {
-        isLand = true;
-        break;
-      }
-    }
-    dots.push({ x, y, z, land: isLand });
-  }
-  return dots;
-}
-
-function WireframeGlobe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const SIZE = 460;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = SIZE * dpr;
-    canvas.height = SIZE * dpr;
-    ctx.scale(dpr, dpr);
-
-    const cx = SIZE / 2;
-    const cy = SIZE / 2;
-    const r = SIZE * 0.34;
-
-    // Theme colors, refreshed whenever data-theme changes
-    let colAccent = "#5e8bff";
-    let colCyan = "#37e0e8";
-    let colLine = "#93a0c0";
-    const refreshColors = () => {
-      colAccent = readVar("--accent") || colAccent;
-      colCyan = readVar("--accent-cyan") || colCyan;
-      colLine = readVar("--text-dim") || colLine;
-    };
-    refreshColors();
-    const observer = new MutationObserver(refreshColors);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-
-    const dots = buildSphere(2200);
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    let spin = -0.4;
-    let t = 0;
-    let animId = 0;
-
-    const draw = () => {
-      ctx.clearRect(0, 0, SIZE, SIZE);
-
-      const cosS = Math.cos(spin);
-      const sinS = Math.sin(spin);
-
-      // soft atmosphere glow behind the sphere
-      const halo = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.25);
-      halo.addColorStop(0, hexA(colAccent, 0.14));
-      halo.addColorStop(1, hexA(colAccent, 0));
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 1.25, 0, Math.PI * 2);
-      ctx.fillStyle = halo;
-      ctx.fill();
-
-      // inner sphere body — subtle lit gradient, offset toward top-left
-      const body = ctx.createRadialGradient(
-        cx - r * 0.35,
-        cy - r * 0.35,
-        0,
-        cx,
-        cy,
-        r
-      );
-      body.addColorStop(0, hexA(colAccent, 0.1));
-      body.addColorStop(0.7, hexA(colAccent, 0.03));
-      body.addColorStop(1, hexA(colAccent, 0));
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle = body;
-      ctx.fill();
-
-      // dotted surface — front hemisphere only, depth-shaded
-      for (const d of dots) {
-        // rotate around Y
-        const x = d.x * cosS + d.z * sinS;
-        const z = -d.x * sinS + d.z * cosS;
-        if (z <= 0.02) continue; // back face
-        const sx = cx + x * r;
-        const sy = cy - d.y * r;
-        const depth = 0.25 + z * 0.75; // 0..1 front-lit
-        if (d.land) {
-          ctx.beginPath();
-          ctx.arc(sx, sy, 1.1 * depth + 0.35, 0, Math.PI * 2);
-          ctx.fillStyle = hexA(colAccent, 0.85 * depth);
-          ctx.fill();
-        } else {
-          ctx.beginPath();
-          ctx.arc(sx, sy, 0.75 * depth + 0.2, 0, Math.PI * 2);
-          ctx.fillStyle = hexA(colLine, 0.28 * depth);
-          ctx.fill();
-        }
-      }
-
-      // crisp limb to define the edge
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.strokeStyle = hexA(colLine, 0.18);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // one elegant orbital ring, tilted
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(-0.42);
-      ctx.scale(1, 0.3);
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 1.28, 0, Math.PI * 2);
-      ctx.strokeStyle = hexA(colCyan, 0.32);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.restore();
-
-      // ISS travelling along the ring, with a soft glow
-      const oa = t * 0.01;
-      const ox = Math.cos(oa) * r * 1.28;
-      const oy = Math.sin(oa) * r * 1.28;
-      const rot = -0.42;
-      const isx = cx + (ox * Math.cos(rot) - oy * 0.3 * Math.sin(rot));
-      const isy = cy + (ox * Math.sin(rot) + oy * 0.3 * Math.cos(rot));
-      const glow = ctx.createRadialGradient(isx, isy, 0, isx, isy, 9);
-      glow.addColorStop(0, hexA(colCyan, 0.85));
-      glow.addColorStop(1, hexA(colCyan, 0));
-      ctx.beginPath();
-      ctx.arc(isx, isy, 9, 0, Math.PI * 2);
-      ctx.fillStyle = glow;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(isx, isy, 2.2, 0, Math.PI * 2);
-      ctx.fillStyle = colCyan;
-      ctx.fill();
-
-      spin += 0.0014;
-      t += 1;
-      if (!reduceMotion) animId = requestAnimationFrame(draw);
-    };
-
-    draw();
-    return () => {
-      cancelAnimationFrame(animId);
-      observer.disconnect();
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{ width: 460, height: 460 }}
-      className="max-w-full h-auto"
-      aria-label="Rotating dotted globe of Earth with a live orbital track"
-    />
-  );
-}
+// The 3D globe is a client-only, lazily-loaded island so it never blocks the
+// hero's first paint and stays out of every other route's bundle.
+const Globe3D = dynamic(() => import("@/components/earth/globe-3d"), {
+  ssr: false,
+  loading: () => <div className="w-full h-full" />,
+});
 
 /* ---------- Live UTC clock (mono telemetry) ---------- */
 
@@ -342,9 +117,9 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease, delay: 0.1 }}
-            className="w-[260px] h-[260px] md:w-[360px] md:h-[360px] mb-8 flex items-center justify-center animate-float"
+            className="w-[300px] h-[300px] md:w-[440px] md:h-[440px] mb-6"
           >
-            <WireframeGlobe />
+            <Globe3D />
           </motion.div>
 
           <motion.h1
