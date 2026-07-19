@@ -391,7 +391,7 @@ export default function HomePage() {
           >
             <span className="flex items-center gap-2">
               <Radio className="w-3.5 h-3.5 text-[var(--accent-cyan)]" />
-              <span className="text-[var(--text-dim)] tracking-widest">{utc.time}</span>
+              <span className="tabular text-[var(--text-dim)] tracking-widest">{utc.time}</span>
               <span className="tracking-[0.2em] uppercase">UTC · {utc.date}</span>
             </span>
             <span className="hidden sm:block w-px h-3 bg-[var(--border-strong)]" />
@@ -431,7 +431,7 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: (i % 3) * 0.08, ease }}
                 className="glass-panel p-7 group"
               >
-                <div className="w-11 h-11 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center mb-6 group-hover:border-[var(--accent)] transition-colors">
+                <div className="icon-tile w-11 h-11 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center mb-6">
                   <Icon className="w-5 h-5 text-[var(--accent)]" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-medium text-[var(--text)] mb-2.5">{m.title}</h3>

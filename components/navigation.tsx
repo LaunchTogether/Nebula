@@ -131,7 +131,7 @@ export function Navigation() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 group cursor-pointer"
+              className="tap flex items-center gap-2 group cursor-pointer"
               aria-label="Search"
             >
               <Search className="w-4 h-4 text-[var(--text-faint)] group-hover:text-[var(--text)] transition-colors" />
@@ -145,7 +145,7 @@ export function Navigation() {
             <div className="flex items-center gap-2">
               <span className="live-dot" />
               <span
-                className="text-xs font-mono text-[var(--text-dim)] tracking-widest"
+                className="tabular text-xs font-mono text-[var(--text-dim)] tracking-widest"
                 aria-label="UTC Time"
               >
                 {time}

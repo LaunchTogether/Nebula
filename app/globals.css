@@ -1,13 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 /* Class-based theming: dark tokens apply under [data-theme="dark"] */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* ------------------------------------------------------------------
+   Type identity — a deliberate, sibling-matched trio for a
+   planet-intelligence instrument:
+   · Instrument Serif — editorial display voice (hero + section heads)
+   · Instrument Sans  — its grotesk sibling: all UI and body text
+   · IBM Plex Mono    — telemetry voice for clocks, coordinates, data
+   The `--font-serif` name is kept so existing .font-serif usages map
+   onto the new display face without a repo-wide rename.
+   ------------------------------------------------------------------ */
 @theme {
-  --font-sans: 'Inter', sans-serif;
-  --font-serif: 'Newsreader', serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', 'Newsreader', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
 /* ============================================================
@@ -220,6 +229,63 @@ body {
 .btn-ghost:hover {
   background: var(--surface-hover);
   border-color: var(--accent);
+}
+
+/* ============================================================
+   Interaction layer — one shared vocabulary of motion so every
+   phase feels part of the same instrument. Timings derive from a
+   single expressive ease; reduced-motion neutralises them below.
+   ============================================================ */
+
+/* Keyboard focus ring — quality floor, applies everywhere */
+:where(a, button, input, textarea, select, [tabindex], summary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* Pointer users never see the ring; only keyboard navigation does */
+:where(a, button):focus:not(:focus-visible) { outline: none; }
+
+/* Animated underline for text links (nav, inline) */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Press feedback for any tappable surface */
+.tap {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tap:active { transform: scale(0.97); }
+
+/* Icon-tile hover used across cards — accent border + subtle lift */
+.icon-tile {
+  transition: border-color 0.35s ease, background 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .icon-tile {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* Number/data ticker — tabular figures so telemetry never jitters */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
 /* Divider */
