@@ -227,11 +227,10 @@ function Globe({ reduce }: { reduce: boolean }) {
   const colors = useThemeColors();
   
   // High-res public textures for realistic Earth
-  const [colorMap, bumpMap, specularMap, cloudsMap] = useTexture([
+  const [colorMap, bumpMap, specularMap] = useTexture([
     "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
     "https://unpkg.com/three-globe/example/img/earth-topology.png",
     "https://unpkg.com/three-globe/example/img/earth-water.png",
-    "https://unpkg.com/three-globe/example/img/earth-clouds10k.png",
   ]);
 
   const { positions: satPositions, colors: satColors } = useSatellitePoints();
@@ -295,13 +294,13 @@ function Globe({ reduce }: { reduce: boolean }) {
         />
       </mesh>
 
-      {/* Cloud Layer */}
-      <mesh>
-        <sphereGeometry args={[R + 0.008, 64, 64]} />
+      {/* Cloud layer (simulated without texture) */}
+      <mesh scale={[1.006, 1.006, 1.006]}>
+        <sphereGeometry args={[R, 64, 64]} />
         <meshStandardMaterial
-          map={cloudsMap}
-          transparent={true}
-          opacity={0.4}
+          color="#ffffff"
+          transparent
+          opacity={0.15}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
